@@ -29,7 +29,13 @@ def plotTestResults(model,L,device,number_elements,number_components,x_train,x_t
 
     original_dir = os.getcwd()
     root_dir = os.path.normpath(os.getcwd() + os.sep + os.pardir)
-    os.chdir(root_dir+"/ContinuousNetworkTheta/SavedPlots")
+    if os.path.exists(root_dir+"/ContinuousNetworkTheta/SavedPlots"):
+        os.chdir(root_dir+"/ContinuousNetworkTheta/SavedPlots")
+    else:
+        os.chdir(root_dir+"/ContinuousNetworkTheta")
+        os.mkdir("SavedPlots")
+        os.chdir(root_dir+"/ContinuousNetworkTheta/SavedPlots")
+        
 
     test_trajectories = np.concatenate((x_test[:,:4],y_test,x_test[:,-4:]),axis=1)
 
