@@ -12,6 +12,8 @@ The codes are organized into 3 main folders:
 
 We add to each of these subdirectories a short readme file to facilitate running the code.
 
+The folder **DataSets** contains the beam code used to generate the data sets, and the two data sets (*both-ends* and *right-end*) mentioned in the paper.
+
 Citation key:
 @article{celledoni2023neural,
       title={Neural networks for the approximation of Euler's elastica}, 
