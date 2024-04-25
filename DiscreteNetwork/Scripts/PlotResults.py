@@ -46,7 +46,7 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, num_nodes, data
             mean_qp[j] = np.mean(norms_qp[:, j])
                 
     if datacase == 1:
-        if percentage_train == 0.9:
+        if percentage_train == 0.8:
             fig1 = plt.figure(figsize = ((20, 15)))
             for i in range(1):
                 plt.plot(true_test[i, np.arange(0, d, 4)], true_test[i, np.arange(1, d, 4)], '-', linewidth = 3, color = 'k', label = 'True')

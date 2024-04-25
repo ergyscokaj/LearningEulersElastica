@@ -69,15 +69,21 @@ def getDataLoaders(batch_size, datacase, percentage_train):
     y_full_test = y_full_test[idx_shuffle_train]
     
     x_train, y_train = x_full_train[:NTrain], y_full_train[:NTrain]
-    if percentage_train == 0.9:
-        x_test, y_test = x_full_test[NTrain:], y_full_test[NTrain:] 
+    if percentage_train == 0.8:
+        Number_Test_Points = int(0.1*N)
+        x_test, y_test = x_full_test[NTrain:NTrain+Number_Test_Points], y_full_test[NTrain:NTrain+Number_Test_Points]
+        x_val, y_val = x_full_test[NTrain+Number_Test_Points:], y_full_test[NTrain+Number_Test_Points:] 
     else:
-        x_test, y_test = x_full_test[NTrain:NTrain+int(0.1*N)], y_full_test[NTrain:NTrain+int(0.1*N)] 
+        Number_Test_Points = int(0.1*N)
+        x_test, y_test = x_full_test[NTrain:NTrain+Number_Test_Points], y_full_test[NTrain:NTrain+Number_Test_Points]
+        x_val, y_val = x_full_test[NTrain+Number_Test_Points:], y_full_test[NTrain+Number_Test_Points:] 
     
     trainset = dataset(x_train,y_train)
     testset = dataset(x_test,y_test)
+    valset = dataset(x_val,y_val)
     
     trainloader = DataLoader(trainset,batch_size=batch_size,shuffle=True)
-    testloader = DataLoader(testset,batch_size=N-NTrain,shuffle=True)
+    testloader = DataLoader(testset,batch_size=len(x_test),shuffle=True)
+    valloader = DataLoader(valset,batch_size=len(x_val),shuffle=True)
     
-    return x_train, y_train, x_test, y_test, trainloader, testloader
+    return x_train, y_train, x_test, y_test, x_val, y_val, trainloader, testloader, valloader
