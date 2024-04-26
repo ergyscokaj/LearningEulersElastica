@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):
@@ -25,9 +26,14 @@ def train(model,gamma,criterion,scheduler,optimizer,epochs,trainloader,valloader
     np.random.seed(1)
     random.seed(1)
     
-    early_stopper = EarlyStopper(patience=10, min_delta=0)
-    
+    early_stopper = EarlyStopper(patience=40, min_delta=0)
+    losses = []
+    losses_val = []
     for epoch in range(epochs):
+        
+        train_loss = 0.
+        counter = 0.
+        
         for _, data in enumerate(trainloader):
             inputs, labels = data[0].to(device), data[1].to(device)
             optimizer.zero_grad()
@@ -49,26 +55,43 @@ def train(model,gamma,criterion,scheduler,optimizer,epochs,trainloader,valloader
             
             loss += gamma * criterion(diff_predicted, diff_labels)
             
+            train_loss += loss.item()
+            
             loss.backward()
             optimizer.step()
+            counter+=1
+        
+        avg_train_loss = train_loss/counter
+        losses.append(avg_train_loss)
+        
         model.eval();
         with torch.no_grad():
             data = next(iter(valloader))
             inputs, labels = data[0].to(device), data[1].to(device)
-            optimizer.zero_grad()
             predicted = model(inputs)  
-            
-            predicted = torch.cat((inputs[:,:4],predicted,inputs[:,4:]),dim=1)
-            labels = torch.cat((inputs[:,:4],labels,inputs[:,4:]),dim=1)
+            #predicted = torch.cat((inputs[:,:4],predicted,inputs[:,4:]),dim=1)
+            #labels = torch.cat((inputs[:,:4],labels,inputs[:,4:]),dim=1)
             val_loss = criterion(predicted, labels)    
         model.train();
+        losses_val.append(val_loss.item())
+        
+        print(f"The average loss in epoch {epoch+1} is ",avg_train_loss)
 
-        if early_stopper.early_stop(val_loss):  
-            print("Early stopping")           
+        '''if early_stopper.early_stop(val_loss):  
+            print("Early stopping")    
+            epochs = epoch + 1     
             break
-        print(f'Loss [{epoch+1}](epoch): ', loss.item())
+        '''
+        #scheduler.step(val_loss)
         scheduler.step()
     print('Training Done')
-    print("Loss : ",loss.item())
+    
+    plt.semilogy(np.arange(epochs),losses,'r-*',label="training loss",markersize=1)
+    plt.semilogy(np.arange(epochs),losses_val,'k-d',label="validation loss",markersize=1)
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss value")
+    plt.legend()
+    plt.title("Training and validation losses")
+    plt.show();
 
     return loss
