@@ -20,7 +20,7 @@ def loadData():
     os.chdir(original_dir)
     return num_nodes, trajectories_train, trajectories_test
 
-def getData(number_elements,number_samples, number_samples_test, trajectories_train, trajectories_test, percentage_train):
+def getDataLoaders(batch_size, number_elements,number_samples, number_samples_test, trajectories_train, trajectories_test, percentage_train):
 
     # Prepare the dictionaries where the data is stored
     x_full_train = np.concatenate((trajectories_train[:,:4],trajectories_train[:,-4:]),axis=1)
@@ -28,12 +28,25 @@ def getData(number_elements,number_samples, number_samples_test, trajectories_tr
     x_full_test = np.concatenate((trajectories_test[:,:4],trajectories_test[:,-4:]),axis=1)
     y_full_test = trajectories_test[:,4:-4]
     Ntrain = int(percentage_train*number_samples)
-    if percentage_train == 0.9:
-        x_train,x_test = x_full_train[:Ntrain], x_full_test[Ntrain:]
-        y_train,y_test = y_full_train[:Ntrain], y_full_test[Ntrain:]
+
+    fact = 0.1
+    
+    x_train, y_train = x_full_train[:Ntrain], y_full_train[:Ntrain]
+    if percentage_train == 0.8:
+        Number_Test_Points = int(fact*number_samples)
+        x_test, y_test = x_full_test[Ntrain:Ntrain+Number_Test_Points], y_full_test[Ntrain:Ntrain+Number_Test_Points]
+        x_val, y_val = x_full_test[Ntrain+Number_Test_Points:Ntrain+2*Number_Test_Points], y_full_test[Ntrain+Number_Test_Points:Ntrain+2*Number_Test_Points] 
     else:
-        x_train,x_test = x_full_train[:Ntrain], x_full_test[Ntrain:Ntrain+int(0.1*number_samples)]
-        y_train,y_test = y_full_train[:Ntrain], y_full_test[Ntrain:Ntrain+int(0.1*number_samples)]  
+        Number_Test_Points = int(fact*number_samples)
+        x_test, y_test = x_full_test[Ntrain:Ntrain+Number_Test_Points], y_full_test[Ntrain:Ntrain+Number_Test_Points]
+        x_val, y_val = x_full_test[Ntrain+Number_Test_Points:Ntrain+2*Number_Test_Points], y_full_test[Ntrain+Number_Test_Points:Ntrain+2*Number_Test_Points] 
+    
+#     if percentage_train == 0.9:
+#         x_train,x_test = x_full_train[:Ntrain], x_full_test[Ntrain:]
+#         y_train,y_test = y_full_train[:Ntrain], y_full_test[Ntrain:]
+#     else:
+#         x_train,x_test = x_full_train[:Ntrain], x_full_test[Ntrain:Ntrain+int(0.1*number_samples)]
+#         y_train,y_test = y_full_train[:Ntrain], y_full_test[Ntrain:Ntrain+int(0.1*number_samples)]  
 
     data_train = {
         "q1":[],
@@ -57,6 +70,17 @@ def getData(number_elements,number_samples, number_samples_test, trajectories_tr
         "vs":[]
     }
 
+    data_val = {
+        "q1":[],
+        "q2":[],
+        "v1":[],
+        "v2":[],
+        "s":[],
+        "sample_number":[],
+        "qs":[],
+        "vs":[]
+    }
+        
     #We consider the bijection of the interval [0,1] with the beam
     x_range = np.linspace(0,1,number_elements+1)
 
@@ -87,7 +111,8 @@ def getData(number_elements,number_samples, number_samples_test, trajectories_tr
                 #True positions in correspondence to coordinate s
                 data_train["qs"].append(trajectories_train[sample][4*node:4*node+2])
                 data_train["vs"].append(trajectories_train[sample][4*node+2:4*node+4])
-            else:
+                
+            if sample in range(Ntrain,Ntrain+Number_Test_Points):
                 #Spatial coordinate
                 data_test["s"].append(x_range[node])
                 data_test["sample_number"].append(sample)
@@ -102,6 +127,21 @@ def getData(number_elements,number_samples, number_samples_test, trajectories_tr
                 #True positions in correspondence to coordinate s
                 data_test["qs"].append(trajectories_test[sample][4*node:4*node+2])
                 data_test["vs"].append(trajectories_test[sample][4*node+2:4*node+4])
+            else:
+                #Spatial coordinate
+                data_val["s"].append(x_range[node])
+                data_val["sample_number"].append(sample)
+
+                #Boundary conditions
+                data_val["q1"].append(trajectories_test[sample][0:2])
+                data_val["v1"].append(trajectories_test[sample][2:4])
+
+                data_val["q2"].append(trajectories_test[sample][-4:-2])
+                data_val["v2"].append(trajectories_test[sample][-2:])
+
+                #True positions in correspondence to coordinate s
+                data_val["qs"].append(trajectories_test[sample][4*node:4*node+2])
+                data_val["vs"].append(trajectories_test[sample][4*node+2:4*node+4])
 
     #Convert the dictionaries into numpy arrays
     data_train["q1"] = np.array(data_train["q1"])
@@ -122,7 +162,28 @@ def getData(number_elements,number_samples, number_samples_test, trajectories_tr
     data_test["qs"] = np.array(data_test["qs"])
     data_test["vs"] = np.array(data_test["vs"])
     
-    return data_train, data_test, x_train, x_test, y_train, y_test
+    data_val["q1"] = np.array(data_val["q1"])
+    data_val["q2"] = np.array(data_val["q2"])
+    data_val["v1"] = np.array(data_val["v1"])
+    data_val["v2"] = np.array(data_val["v2"])
+    data_val["s"] = np.array(data_val["s"])
+    data_val["sample_number"] = np.array(data_val["sample_number"])
+    data_val["qs"] = np.array(data_val["qs"])
+    data_val["vs"] = np.array(data_val["vs"])
+    
+    print("train : ",x_train.shape)
+    print("val : ",x_val.shape)
+    print("test : ",x_test.shape)
+    
+    trainset = dataset(data_train)
+    testset = dataset(data_test)
+    valset = dataset(data_val)
+    
+    trainloader = DataLoader(trainset,batch_size=batch_size,shuffle=True)
+    testloader = DataLoader(testset,batch_size=len(x_test),shuffle=True)
+    valloader = DataLoader(valset,batch_size=len(x_val),shuffle=True)
+    
+    return data_train, data_test, data_val, x_train, x_test, y_train, y_test, x_val, y_val, trainloader, testloader, valloader
 
 class dataset(Dataset):
   def __init__(self,data):
@@ -141,12 +202,3 @@ class dataset(Dataset):
     return self.q1[idx],self.q2[idx],self.v1[idx],self.v2[idx],self.s[idx],self.sample[idx],self.qs[idx],self.vs[idx]
   def __len__(self):
     return self.length
-
-def getDataLoaders(batch_size, data_train, data_test):
-
-    trainset = dataset(data_train)
-    testset = dataset(data_test)
-
-    trainloader = DataLoader(trainset,batch_size=batch_size,shuffle=True)
-    testloader = DataLoader(testset,batch_size=1,shuffle=True)
-    return trainloader, testloader

@@ -131,7 +131,7 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
     pred_overall_all[:, qp_idx] = pred_all_qp
     print(f"Error over all trajectories: {np.mean((pred_overall_all-all_trajectories)**2)}.")
     
-    if percentage_train == 0.9:
+    if percentage_train == 0.8:
         
         fig1 = plt.figure(figsize=(20, 15))
         for j in range(len(test_trajectories)):
