@@ -69,9 +69,9 @@ def getDataLoaders(batch_size, datacase, percentage_train):
     y_full_test = y_full_test[idx_shuffle_train]
     
     fact = 0.
-    if percentage_train==80:
+    if percentage_train==0.8:
         fact = 0.1
-    elif percentage_train==70:
+    elif percentage_train==0.7:
         fact = 0.15
     else:
         fact = 0.2
