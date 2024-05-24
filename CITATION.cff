@@ -1,6 +1,7 @@
 # This CITATION.cff file was generated with cffinit.
 # Visit https://bit.ly/cffinit to generate yours today!
 
+type: dataset 
 cff-version: 1.2.0
 title: Euler's elastica discrete trajectories data set
 message: >-
@@ -13,4 +14,19 @@ authors:
     email: ergys.cokaj@ntnu.no
     affiliation: 'Norwegian University of Science and Technology '
     orcid: 'https://orcid.org/0000-0002-8946-3487'
+ - given-names: 'Andrea'
+   family-names: LEONE
+   email: andrea.leone@ntnu.no
+   affiliation: 'Norwegian University of Science and Technology '
+   orcid: ''
+ - given-names: 'Davide'
+   family-names: MURARI
+   email: davide.murari@ntnu.no
+   affiliation: 'Norwegian University of Science and Technology '
+   orcid: ''
+ - given-names: 'Martina'
+   family-names: STAVOLE
+   email: martina.stavole@fau.de
+   affiliation: 'Friedrich-Alexander-Universität Erlangen-Nürnberg'
+   orcid: 'https://orcid.org/0009-0008-1402-2645'
 repository-code: 'https://github.com/ergyscokaj/LearningEulersElastica'
