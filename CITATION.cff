@@ -15,5 +15,7 @@ authors:
    given-names: "Martina"
    orcid: "https://orcid.org/0009-0008-1402-2645"
 title: "Euler's elastica discrete trajectories data set"
+version: 
+doi: 
 date-released: 2023-11-30
 url: "https://github.com/ergyscokaj/LearningEulersElastica"
