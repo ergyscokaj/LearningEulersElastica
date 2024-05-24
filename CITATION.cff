@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Euler's elastica discrete trajectories data set
+message: >-
+  If you use this dataset, please cite it using the metadata
+  from this file.
+type: dataset
+authors:
+  - given-names: 'Ergys '
+    family-names: ÇOKAJ
+    email: ergys.cokaj@ntnu.no
+    affiliation: 'Norwegian University of Science and Technology '
+    orcid: 'https://orcid.org/0000-0002-8946-3487'
+repository-code: 'https://github.com/ergyscokaj/LearningEulersElastica'
