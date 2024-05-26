@@ -1,32 +1,16 @@
 def hyperparams(percentage_train):
     params = {}
-    if percentage_train == 0.9:
-        params = {'normalize': True,
-                 'networkarch': 0,
-                 'act': 'tanh',
-                 'n_layers': 5,
-                 'hidden_nodes': 190,
-                 'lr': 0.0030252919955671568}
+    if percentage_train == 0.8:
+        params = {'n_layers': 6,
+                 'hidden_nodes': 106}
     elif percentage_train == 0.4:
-        params = {'normalize': True, 
-                  'networkarch': 0, 
-                  'act': 'sin', 
-                  'n_layers': 6, 
-                  'hidden_nodes': 169, 
-                  'lr': 0.004200891908289064}
+        params = {'n_layers': 8, 
+                  'hidden_nodes': 181}
     elif percentage_train == 0.2:
-        params = {'normalize': True, 
-                  'networkarch': 0, 
-                  'act': 'tanh', 
-                  'n_layers': 6, 
-                  'hidden_nodes': 121, 
-                  'lr': 0.0049131348704520815}
+        params = {'n_layers': 7, 
+                  'hidden_nodes': 185}
     else:
-        params = {'normalize': True, 
-                  'networkarch': 0, 
-                  'act': 'tanh', 
-                  'n_layers': 5, 
-                  'hidden_nodes': 193, 
-                  'lr': 0.00454864923403576}
+        params = {'n_layers': 6, 
+                  'hidden_nodes': 139}
     return params
     
