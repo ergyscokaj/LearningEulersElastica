@@ -59,6 +59,7 @@ def getDataLoaders(batch_size, datacase, percentage_train):
     
     idx_shuffle_train = np.arange(N)
     random.shuffle(idx_shuffle_train)
+        
     x_full_train = x_full_train[idx_shuffle_train]
     y_full_train = y_full_train[idx_shuffle_train]
     
@@ -68,23 +69,13 @@ def getDataLoaders(batch_size, datacase, percentage_train):
     x_full_test = x_full_test[idx_shuffle_train]
     y_full_test = y_full_test[idx_shuffle_train]
     
-    fact = 0.
-    if percentage_train==80:
-        fact = 0.1
-    elif percentage_train==70:
-        fact = 0.15
-    else:
-        fact = 0.2
+    fact = 0.1
     
     x_train, y_train = x_full_train[:NTrain], y_full_train[:NTrain]
-    if percentage_train == 0.8:
-        Number_Test_Points = int(fact*N)
-        x_test, y_test = x_full_test[NTrain:NTrain+Number_Test_Points], y_full_test[NTrain:NTrain+Number_Test_Points]
-        x_val, y_val = x_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points], y_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points] 
-    else:
-        Number_Test_Points = int(fact*N)
-        x_test, y_test = x_full_test[NTrain:NTrain+Number_Test_Points], y_full_test[NTrain:NTrain+Number_Test_Points]
-        x_val, y_val = x_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points], y_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points] 
+
+    Number_Test_Points = int(fact*N)
+    x_test, y_test = x_full_test[NTrain:NTrain+Number_Test_Points], y_full_test[NTrain:NTrain+Number_Test_Points]
+    x_val, y_val = x_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points], y_full_test[NTrain+Number_Test_Points:NTrain+2*Number_Test_Points] 
  
     print("train : ",x_train.shape)
     print("val : ",x_val.shape)

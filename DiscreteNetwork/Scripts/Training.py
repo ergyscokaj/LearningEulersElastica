@@ -26,7 +26,7 @@ def train(model,gamma,criterion,scheduler,optimizer,epochs,trainloader,valloader
     np.random.seed(1)
     random.seed(1)
     
-    early_stopper = EarlyStopper(patience=40, min_delta=0)
+    early_stopper = EarlyStopper(patience=100, min_delta=0)
     losses = []
     losses_val = []
     for epoch in range(epochs):
@@ -75,23 +75,24 @@ def train(model,gamma,criterion,scheduler,optimizer,epochs,trainloader,valloader
         model.train();
         losses_val.append(val_loss.item())
         
-        print(f"The average loss in epoch {epoch+1} is ",avg_train_loss)
+        if epoch%int(0.1*epochs)==0 and epoch>1:
+            print(f"The average loss in epoch {epoch+1} is ",avg_train_loss)
 
         '''if early_stopper.early_stop(val_loss):  
             print("Early stopping")    
-            epochs = epoch + 1     
-            break
-        '''
+            #epochs = epoch + 1     
+            break'''
+        
         #scheduler.step(val_loss)
         scheduler.step()
     print('Training Done')
     
-    plt.semilogy(np.arange(epochs),losses,'r-*',label="training loss",markersize=1)
+    '''plt.semilogy(np.arange(epochs),losses,'r-*',label="training loss",markersize=1)
     plt.semilogy(np.arange(epochs),losses_val,'k-d',label="validation loss",markersize=1)
     plt.xlabel("Epochs")
     plt.ylabel("Loss value")
     plt.legend()
     plt.title("Training and validation losses")
-    plt.show();
+    plt.show();'''
 
     return loss
