@@ -1,0 +1,6 @@
+pctg_train,datacase,gamma,nlayers,hidden_nodes,training_error,testing_error,validation_error,total_error
+0.8,2,0.0073229668983443436,3,616,9.89305393268878e-08,7.853911607900467e-08,1.1255125279980154e-07,9.825449785417167e-08
+pctg_train,datacase,gamma,nlayers,hidden_nodes,training_error,testing_error,validation_error,total_error
+0.8,2,0.0073229668983443436,3,616,9.89305393268878e-08,7.853911607900467e-08,1.1255125279980154e-07,9.825449785417167e-08
+pctg_train,datacase,gamma,nlayers,hidden_nodes,training_error,testing_error,validation_error,total_error
+0.8,1,0.003853035138801786,4,985,1.139739734161958e-07,4.00852061509189e-07,2.1512985530327538e-07,1.5258039885583756e-07

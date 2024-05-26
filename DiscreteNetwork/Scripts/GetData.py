@@ -19,10 +19,7 @@ def loadData(datacase = 1):
     if datacase == 1: # train and test on the both-ends data set
         trajectories_train = trajectoriesload_b_360
         trajectories_test = trajectories_train
-    elif datacase == 2: # train on the both-ends data set and test on the right-end data set (EXTRAPOLATION)
-        trajectories_train = trajectoriesload_b_360 
-        trajectories_test = trajectoriesload_r_360 
-    elif datacase == 3: # train and test on the both-ends+right-end data set
+    elif datacase == 2: # train and test on the both-ends+right-end data set
         trajectories_train = np.concatenate((trajectoriesload_b_360, trajectoriesload_r_360), axis = 0)
         trajectories_test = trajectories_train
     else:

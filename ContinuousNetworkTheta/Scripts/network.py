@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.func import jacfwd, vmap
 import numpy as np
-
+import torch
 from numpy.core.multiarray import vdot
 
 
@@ -94,26 +94,26 @@ class theta_net(nn.Module):
     return output*torch.pi
 
 class network(nn.Module):
-        def __init__(self,L=3.3,impose_bcs=True,act_name='sin', nlayers=3, hidden_nodes = 100, is_res=True, is_deeponet=False):
+        def __init__(self,impose_bcs=True,act_name='sin', nlayers=3, hidden_nodes = 100, is_res=True, is_deeponet=False):
           super().__init__()
 
           torch.manual_seed(1)
           np.random.seed(1)
-
+          L = 3.3
           self.L = L
           self.impose_bcs = impose_bcs
           self.parametric_part = theta_net(act_name, nlayers, hidden_nodes, is_res, is_deeponet)
 
         def find_theta(self,v):
-          return torch.atan2(v[:,1:2], v[:,0:1])
+            return torch.atan2(v[:,1:2], v[:,0:1])
 
         def local_poly_left(self,s,d=1/30):
           return (d - s)**3/d**3  #polynomial which is 1 at s=0, and at s=d it vanishes together with its first two derivatives
         def local_poly_right(self,s,d=1/30):
-          return (d + s - self.L)**3/d**3 #same but for the right node
+          return (d + s - L)**3/d**3 #same but for the right node
 
         def theta(self,s,q1,q2,v1,v2):
-
+          L = 3.3
           s = s.reshape(-1,1)
           q1 = q1.reshape(-1,2)
           q2 = q2.reshape(-1,2)

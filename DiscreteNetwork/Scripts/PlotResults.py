@@ -83,7 +83,6 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.tick_params(labelsize = "45")
         plt.legend(fontsize = "45", loc = 'best')
         plt.title(r"Comparison over test trajectories $(q_x, q_y)$", fontsize = "45")
-        plt.savefig(f"savedPlots/q_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()
 
         fig2 = plt.figure(figsize = ((20, 15)))
@@ -102,7 +101,6 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.axis('equal')
         plt.title(r"Comparison over test trajectories $(q^{\prime}_x, q^{\prime}_y)$", fontsize = "45")
         plt.legend(fontsize = "45", loc = 'center')
-        plt.savefig(f"savedPlots/qprime_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()
 
         fig3 = plt.figure(figsize = ((20, 15)))
@@ -113,11 +111,10 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.tick_params(labelsize = "45")
         plt.title(r"Mean error over test trajectories", fontsize = "45")
         plt.legend(fontsize = "45", loc = 'best')
-        plt.savefig(f"savedPlots/error_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()
 
     
-    if datacase == 3:
+    if datacase == 2:
         fig1 = plt.figure(figsize = ((20, 15)))
         for i in range(1):
             plt.plot(true_test[i, np.arange(0, d, 4)], true_test[i, np.arange(1, d, 4)], '-', linewidth = 3, color = 'k', label = 'True')
@@ -130,7 +127,6 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.tick_params(labelsize = "45")
         plt.legend(fontsize = "45", loc = 'best')
         plt.title(r"Comparison over test trajectories $(q_x, q_y)$", fontsize = "45")
-        plt.savefig(f"savedPlots/q_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()
 
         fig2 = plt.figure(figsize = ((20, 15)))
@@ -151,7 +147,6 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.axis('equal')
         plt.title(r"Comparison over test trajectories $(q^{\prime}_x, q^{\prime}_y)$", fontsize = "45")
         plt.legend(fontsize = "45", loc = 'center')
-        plt.savefig(f"savedPlots/qprime_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()
 
         fig3 = plt.figure(figsize = ((20, 15)))
@@ -162,5 +157,4 @@ def plotResults(model, device, x_train, y_train, x_test, y_test, x_val, y_val, n
         plt.tick_params(labelsize = "45")
         plt.title(r"Mean error over test trajectories", fontsize = "45")
         plt.legend(fontsize = "45", loc = 'best')
-        plt.savefig(f"savedPlots/error_pctg_{percentage_train}_datacase_{datacase}.pdf",bbox_inches='tight')
         plt.show()

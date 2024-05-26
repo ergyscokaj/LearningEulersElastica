@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn as nn
 
 #It extracts the entries correspondent to boundary conditions
 
@@ -43,8 +44,8 @@ def reconstruct_q_comp(q1,q2,v1,v2,model,upper,comp=0,k=10):
 
 num_elements = 50
 
-def reconstruct_q(q1,q2,v1,v2,L,model,device):
-
+def reconstruct_q(q1,q2,v1,v2,model,device):
+  L = 3.3
   beam_nodes = np.linspace(0,L,num_elements+1)
 
   q1t,q2t,v1t,v2t = torch.from_numpy(q1.astype(np.float32)).to(device), torch.from_numpy(q2.astype(np.float32)).to(device), torch.from_numpy(v1.astype(np.float32)).to(device), torch.from_numpy(v2.astype(np.float32)).to(device)
@@ -104,28 +105,25 @@ def reconstruct_q_torch(model,node,q1,q2,v1,v2,comp=0,k=10):
 def compatibility_condition(q1,q2,v1,v2,model,comp=0,k=5):
   #Gaussian quadrature on k nodes
   #comp determines if we integrate the x or y component, respectively with comp=0 and 1.
-
+  L = 3.3
   integrand = lambda s,q1,q2,v1,v2 : model(s,q1,q2,v1,v2)[:,comp:comp+1]
 
-  #q1_og = q1.detach().clone()
-  #q2_og = q2.detach().clone()
-
   bs = len(v1)
-  tt = torch.linspace(0,L,k+1).unsqueeze(1).to(q1.device)
+  tt = torch.linspace(0,L,k+1).unsqueeze(1).to(device)
   ba = tt[1]-tt[0] #divide the interval [0,1] into k subintervals of size ba, over which we apply Gaussian 3 point quadrature
 
 
-  w1 = ba * 8/9 / 2 * torch.ones_like(tt[:-1]).to(q1.device)
-  w2 = ba * 5/9 / 2 * torch.ones_like(tt[:-1]).to(q1.device)
-  w3 = ba * 5/9 / 2 * torch.ones_like(tt[:-1]).to(q1.device)
+  w1 = ba * 8/9 / 2 * torch.ones_like(tt[:-1]).to(device)
+  w2 = ba * 5/9 / 2 * torch.ones_like(tt[:-1]).to(device)
+  w3 = ba * 5/9 / 2 * torch.ones_like(tt[:-1]).to(device)
   x1 = (tt[:-1]+tt[1:])/2  #mapping of 0 node
   x2 = (tt[:-1]+tt[1:])/2  + 0.5 * (-np.sqrt(3/5)) * ba #mapping of -sqrt(3/5) node
   x3 = (tt[:-1]+tt[1:])/2  + 0.5 * (np.sqrt(3/5)) * ba #mapping of sqrt(3/5) node
 
-  quad_nodes = torch.cat((x1,x2,x3),dim=0).to(q1.device)
-  quad_weights = torch.cat((w1,w2,w3),dim=0).to(q1.device)
-  ones_like_nodes = torch.ones_like(quad_nodes).to(q1.device)
-  ones_like_bcs = torch.ones((len(v1),1)).to(q1.device)
+  quad_nodes = torch.cat((x1,x2,x3),dim=0).to(device)
+  quad_weights = torch.cat((w1,w2,w3),dim=0).to(device)
+  ones_like_nodes = torch.ones_like(quad_nodes).to(device)
+  ones_like_bcs = torch.ones((len(v1),1)).to(device)
 
   s = torch.kron(ones_like_bcs,quad_nodes)
   w = torch.kron(ones_like_bcs,quad_weights)
