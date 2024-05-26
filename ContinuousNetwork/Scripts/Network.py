@@ -38,7 +38,7 @@ class approximate_curve(nn.Module):
           
           self.linearsO = nn.ModuleList([nn.Linear(self.hidden_nodes,self.hidden_nodes) for i in range(self.nlayers)])
 
-          # the next foru lines are layers of multiplicative trunk
+          # the next four lines are layers of multiplicative trunk
           self.lift_U = nn.Linear(self.hidden_nodes,self.hidden_nodes)
           self.lift_V = nn.Linear(self.hidden_nodes,self.hidden_nodes)
           
@@ -161,9 +161,9 @@ class approximate_curve(nn.Module):
 
         def normalize(self,q1,q2,v1,v2):
           q1n = (q1-1.5) / 1.5
-          q2n = q2 #q2n = (q2+1) / 1 - 1
-          v1n = v1 #(v1+3) / 3 - 1
-          v2n = v2 #(v2+3) / 3 - 1
+          q2n = q2 
+          v1n = v1 
+          v2n = v2 
           return q1n,q2n,v1n,v2n
 
         #The forward method assembles q by combining the proper network "parametric_part"

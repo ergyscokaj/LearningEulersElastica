@@ -37,45 +37,19 @@ def eval_derivative_model(model,device,s,q1,q2,v1,v2):
 
     return model.derivative(s_,q1,q2,v1,v2).detach().cpu().numpy().reshape(-1)
 
-
-def plotTestResults(model,device,number_elements,number_components,x_train,x_test,y_train,y_test, num_nodes, percentage_train):
+def plotTestResults(model,device,number_elements,number_components,x_train,x_val,x_test,y_train,y_val,y_test, num_nodes, percentage_train):
 
     criterion = nn.MSELoss()
 
     training_trajectories = np.concatenate((x_train[:,:4],y_train,x_train[:,-4:]),axis=1)
+    val_trajectories = np.concatenate((x_val[:,:4],y_val,x_val[:,-4:]),axis=1)
     test_trajectories = np.concatenate((x_test[:,:4],y_test,x_test[:,-4:]),axis=1)
-    all_trajectories = np.concatenate((training_trajectories, test_trajectories), axis = 0)
-
-    bcs = getBCs(test_trajectories)
-    q1 = bcs["q1"]
-    q2 = bcs["q2"]
-    v1 = bcs["v1"]
-    v2 = bcs["v2"]
-
-    q1 = torch.from_numpy(bcs["q1"].astype(np.float32)).to(device)
-    q2 = torch.from_numpy(bcs["q2"].astype(np.float32)).to(device)
-    v1 = torch.from_numpy(bcs["v1"].astype(np.float32)).to(device)
-    v2 = torch.from_numpy(bcs["v2"].astype(np.float32)).to(device)
+    all_trajectories = np.concatenate((training_trajectories, val_trajectories, test_trajectories), axis = 0)
 
     q_idx = flatten_chain([[i,i+1] for i in np.arange(0,number_components,4)]) #indices of the qs
     qp_idx = flatten_chain([[i+2,i+3] for i in np.arange(0,number_components,4)]) #indices of the qs
-
-    xx = torch.linspace(0,1,number_elements+1).unsqueeze(1).repeat(len(q1),1).to(device)
-    one = torch.ones((number_elements+1,1)).to(device)
-    q1_augmented = torch.kron(q1,one)
-    q2_augmented = torch.kron(q2,one)
-    v1_augmented = torch.kron(v1,one)
-    v2_augmented = torch.kron(v2,one)
-
-    pred_test_q = model(xx,q1_augmented,q2_augmented,v1_augmented,v2_augmented).reshape(len(q1),-1).detach().cpu().numpy()
-    pred_test_qp = model.derivative(xx,q1_augmented,q2_augmented,v1_augmented,v2_augmented).reshape(len(q1),-1).detach().cpu().numpy()
-    pred_test_all = np.zeros_like(test_trajectories)
-    pred_test_all[:, q_idx] = pred_test_q
-    pred_test_all[:, qp_idx] = pred_test_qp
-    print(f"Error over test trajectories: {np.mean((pred_test_all-test_trajectories)**2)}.")
-
-    ## Calculating the error on the training and all trajectories
-
+    
+    ## Calculating the error on the training trajectories
     bcs_train = getBCs(training_trajectories)
     q1_train = bcs_train["q1"]
     q2_train = bcs_train["q2"]
@@ -103,6 +77,62 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
     pred_train_all[:, qp_idx] = pred_train_qp
     print(f"Error over training trajectories: {np.mean((pred_train_all-training_trajectories)**2)}.")
 
+    
+    ## Calculating the error on the validation trajectories
+    bcs_val = getBCs(val_trajectories)
+    q1_train = bcs_val["q1"]
+    q2_train = bcs_val["q2"]
+    v1_train = bcs_val["v1"]
+    v2_train = bcs_val["v2"]
+
+    xx_val = np.linspace(0, 1, number_elements+1)
+
+    q1_val = torch.from_numpy(bcs_val["q1"].astype(np.float32)).to(device)
+    q2_val = torch.from_numpy(bcs_val["q2"].astype(np.float32)).to(device)
+    v1_val = torch.from_numpy(bcs_val["v1"].astype(np.float32)).to(device)
+    v2_val = torch.from_numpy(bcs_val["v2"].astype(np.float32)).to(device)
+
+    xx_val = torch.linspace(0,1,number_elements+1).unsqueeze(1).repeat(len(q1_train),1).to(device)
+    one = torch.ones((number_elements+1,1)).to(device)
+    q1_val_augmented = torch.kron(q1_val,one)
+    q2_val_augmented = torch.kron(q2_val,one)
+    v1_val_augmented = torch.kron(v1_val,one)
+    v2_val_augmented = torch.kron(v2_val,one)
+
+    pred_val_q = model(xx_val,q1_val_augmented,q2_val_augmented,v1_val_augmented,v2_val_augmented).reshape(len(q1_val),-1).detach().cpu().numpy()
+    pred_val_qp = model.derivative(xx_val,q1_val_augmented,q2_val_augmented,v1_val_augmented,v2_val_augmented).reshape(len(q1_val),-1).detach().cpu().numpy()
+    pred_val_all = np.zeros_like(val_trajectories)
+    pred_val_all[:, q_idx] = pred_val_q
+    pred_val_all[:, qp_idx] = pred_val_qp
+    print(f"Error over validation trajectories: {np.mean((pred_val_all-val_trajectories)**2)}.")
+
+    ## Calculating the error on the test trajectories
+    bcs = getBCs(test_trajectories)
+    q1 = bcs["q1"]
+    q2 = bcs["q2"]
+    v1 = bcs["v1"]
+    v2 = bcs["v2"]
+
+    q1 = torch.from_numpy(bcs["q1"].astype(np.float32)).to(device)
+    q2 = torch.from_numpy(bcs["q2"].astype(np.float32)).to(device)
+    v1 = torch.from_numpy(bcs["v1"].astype(np.float32)).to(device)
+    v2 = torch.from_numpy(bcs["v2"].astype(np.float32)).to(device)
+
+    xx = torch.linspace(0,1,number_elements+1).unsqueeze(1).repeat(len(q1),1).to(device)
+    one = torch.ones((number_elements+1,1)).to(device)
+    q1_augmented = torch.kron(q1,one)
+    q2_augmented = torch.kron(q2,one)
+    v1_augmented = torch.kron(v1,one)
+    v2_augmented = torch.kron(v2,one)
+
+    pred_test_q = model(xx,q1_augmented,q2_augmented,v1_augmented,v2_augmented).reshape(len(q1),-1).detach().cpu().numpy()
+    pred_test_qp = model.derivative(xx,q1_augmented,q2_augmented,v1_augmented,v2_augmented).reshape(len(q1),-1).detach().cpu().numpy()
+    pred_test_all = np.zeros_like(test_trajectories)
+    pred_test_all[:, q_idx] = pred_test_q
+    pred_test_all[:, qp_idx] = pred_test_qp
+    print(f"Error over test trajectories: {np.mean((pred_test_all-test_trajectories)**2)}.")
+    
+    ## Calculating the error on all trajectories
     bcs_all = getBCs(all_trajectories)
     q1_all = bcs_all["q1"]
     q2_all = bcs_all["q2"]
@@ -131,7 +161,7 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
     pred_overall_all[:, qp_idx] = pred_all_qp
     print(f"Error over all trajectories: {np.mean((pred_overall_all-all_trajectories)**2)}.")
     
-    if percentage_train == 0.9:
+    if percentage_train == 0.8:
         
         fig1 = plt.figure(figsize=(20, 15))
         for j in range(len(test_trajectories)):
@@ -150,8 +180,11 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
             plt.tick_params(labelsize = "45")
             plt.legend(fontsize = "45", loc = 'center')
             plt.title(r"Comparison over test trajectories $(q_x, q_y)$", fontsize = "45")
-
+            plt.savefig("continuous_80_10_10_qx_qy_test.pdf", bbox_inches='tight')
+            
         fig2 = plt.figure(figsize=(20, 15))
+        circle = plt.Circle((0, 0), 1, color='k', alpha = 0.5, fill=False)
+        plt.gca().add_patch(circle)
         for j in range(len(test_trajectories)):
             v_x_true = test_trajectories[j,np.arange(2,number_components,4)]
             v_y_true = test_trajectories[j,np.arange(3,number_components,4)]
@@ -169,7 +202,8 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
             plt.axis('equal')
             plt.title(r"Comparison over test trajectories $(q^{\prime}_x, q^{\prime}_y)$", fontsize = "45")
             plt.legend(fontsize = "45", loc = 'best')
-
+            plt.savefig("continuous_80_10_10_qpx_qpy_test.pdf", bbox_inches='tight')
+            
         norms_q = np.zeros((len(pred_test_q), num_nodes))
         mean_q = np.zeros(num_nodes)
         norms_qp = np.zeros((len(pred_test_q), num_nodes))
@@ -190,6 +224,6 @@ def plotTestResults(model,device,number_elements,number_components,x_train,x_tes
         plt.tick_params(labelsize = "45")
         plt.title(r"Mean error over test trajectories", fontsize = "45")
         plt.legend(fontsize = "45", loc = 'best')
+        plt.savefig("continuous_80_10_10_mean_error_test.pdf", bbox_inches='tight')
         plt.show()
-
     return pred_all_q, pred_all_qp
